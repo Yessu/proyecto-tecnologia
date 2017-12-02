@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<title></title>
+</head>
+<style type="text/css">
+	video{
+size: cover;
+-attachment:fixed;
+-repeat: no repeat;   
+	}
+
+</style>
+<body>
+<video id="video">
+</video>
+<canvas id="canvas" width="170" height="200"></canvas>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+//Declarando las variables para iniciar
+	(function (d,w,n, io) {
+		'use strict'
+		var io = io(),
+			startCamera = false,
+			video = d.querySelector('#video'),
+			canvas = d.querySelector('#canvas'),
+			context = canvas.getContext('2d')
+
+			//Habilitar la camara por medio del navegador
+				n.Streaming = (
+				n.getUserMedia ||
+				n.webkitGetUSerMedia ||
+				n.mozGetUserMedia ||
+				n.msGEtUserMedia
+				)
+//habilitar video y audio del ordenador mediante el navegador
+		n.Streaming({
+			video : true,
+			audio : false
+		},function(stream){
+			startCamera = true,
+			video.src =w.URL.createObjectURL(stream)
+		},function (err) {
+			alert('Error al acceder a la camara Web: '+ err)
+		})
+		//enviar entre 12 imagenes por segundo al navegador para simular video
+		w.playVideo= (function(cb){
+			return 	w.requestAnimationFrame ||
+					w.webkitRequestAnimationFrame ||
+					w.mozRequestAnimationFrame ||
+					w.msRequestAnimationFrame ||
+					function (cb){
+						w.setTimeout(cb, 1000/110)
+					}
+		})()
+		//posiciones de camara
+		function streamVideo(context,canvas,video) {
+			var outputStream = canvas.toDataURL('image/jpeg', .3)
+			context.drawImage(video, -300,-150)
+	//captar las imagenes para hacer buble de pedidos de imagenes
+	
+			if (startCamera) 
+				io.emit('streaming',outputStream)
+
+			playVideo(function(){
+				streamVideo(context,canvas,video)
+			})
+		}
+//recargar o cargar imagenes
+		w.addEventListener('load',function(){
+			video.autoplay = true,
+			video.style.display ='none',
+			streamVideo(context, canvas, video)
+		})
+			
+	})(document,window,navigator, io)
+</script>
+</body>
+</html>
