@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<title>Cliente de Streaming</title>
+</head>
+<body>
+<img id="streaming" style="size: cover">
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	(function (d, io) {
+		'use strict'
+		var io = io()
+		//solicitar imagenes del nodejs
+	io.on('play stream',function(image){
+		d.querySelector('#streaming').src=image
+			})
+
+	})(document,io)
+</script>
+</body>
+</html>
